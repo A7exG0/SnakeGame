@@ -23,25 +23,25 @@ while(not game_over):
             game_over = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                x1_change = -10
+                x1_change = -20
                 y1_change = 0
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                x1_change = 10
+                x1_change = 20
                 y1_change = 0
             elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                y1_change = -10
+                y1_change = -20
                 x1_change = 0
             elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                y1_change = 10
+                y1_change = 20
                 x1_change = 0
 
     x1 += x1_change 
     y1 += y1_change 
 
-    clock.tick(10)
+    clock.tick(5)
  
-    display.fill(background_color)
-    pygame.draw.rect(display, snake_color, [x1, y1, 20, 20])
+    display.fill(background_color) # заливаем все белым
+    pygame.draw.rect(display, snake_color, [x1, y1, 20, 20]) # x1, y1 - новая позиция змейки; 20, 20 - размеры кубика
     pygame.display.update()
 
 pygame.quit()
