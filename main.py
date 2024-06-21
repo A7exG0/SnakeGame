@@ -43,11 +43,11 @@ def display_game_over(record):
     # Наносим на на новый Surface текст
     font = pygame.font.SysFont(None, 24)
     if record <= MAX_RECORD: 
-        first_text = font.render(f'Game Over! Your record is {record}', True, white)
+        first_text = font.render(f'Game Over! Your result is {record}', True, white)
         second_text = font.render('Press R to Restart', True, white)
     else:
         MAX_RECORD = record
-        first_text = font.render(f'Game Over! Your record is {record}', True, yellow)
+        first_text = font.render(f'Game Over! Your result is {record}', True, yellow)
         second_text = font.render(f'You have broken the record!', True, yellow)
         third_text = font.render('Press R to Restart', True, yellow)
         text_surface.blit(third_text, (30, 20 + 2 * font.get_linesize()))
@@ -112,15 +112,19 @@ while(running):
             if event.key == pygame.K_LEFT or event.key == pygame.K_a and x1_change == 0:
                 x1_change = -SNAKE_SIZE
                 y1_change = 0
+                break 
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_d and x1_change == 0:
                 x1_change = SNAKE_SIZE
                 y1_change = 0
+                break
             elif event.key == pygame.K_UP or event.key == pygame.K_w and y1_change == 0:
                 y1_change = -SNAKE_SIZE
                 x1_change = 0
+                break
             elif event.key == pygame.K_DOWN or event.key == pygame.K_s and y1_change == 0:
                 y1_change = SNAKE_SIZE
                 x1_change = 0
+                break
 
     new_x1 = x1 + x1_change 
     new_y1 = y1 + y1_change 
