@@ -17,7 +17,7 @@ food_color = (200, 10, 100, 255) # rgb(200, 10, 100, 255)
 yellow = (255, 255, 0, 255) # rgb(255, 255, 0, 255)  
 black = (0, 0, 0)
 
-### Классы
+### КЛАССЫ
 class Coordinate():
     def __init__(self, x, y):
         self.x = x
@@ -196,6 +196,3 @@ while(running):
             game_over = True
 
         pygame.display.update()
-
-pygame.quit()
-quit()
