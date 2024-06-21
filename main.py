@@ -9,10 +9,13 @@ MAX_Y = 600
 SNAKE_SIZE =  20
 FOOD_RADIUS = SNAKE_SIZE // 2
 RECORD_HEIGHT = MAX_Y // 15
+MAX_RECORD = 0
 snake_color = blue = (0,0,255, 255)  # rgb(0,0,255, 255)
 background_color = white = (255, 255, 255, 255) #rgb(255, 255, 255, 255)
 snake_lose_color = red = (255, 0, 0, 255) # rgb(255, 0, 0, 255)
 food_color = (200, 10, 100, 255) # rgb(200, 10, 100, 255)
+yellow = (255, 255, 0, 255) # rgb(255, 255, 0, 255)  
+
 black = (0, 0, 0)
 
 
@@ -28,18 +31,29 @@ def create_food(display):
     pygame.draw.circle(display, food_color, [x, y], FOOD_RADIUS)
     return x - FOOD_RADIUS, y - FOOD_RADIUS
 
-def display_game_over():
+def display_game_over(record):
     '''
     Создает панельку меню при проигрыше с возможностью переиграть
     '''
+    global MAX_RECORD
     # Создание Surface для текста
     text_surface = pygame.Surface((300, 100))
-    text_surface.fill(blue)  # Заполнение поверхности черным цветом
+    text_surface.fill(blue)  # Заполнение поверхности синим цветом
 
     # Наносим на на новый Surface текст
     font = pygame.font.SysFont(None, 24)
-    text = font.render('Game Over! Press R to Restart', True, white)
-    text_surface.blit(text, (30, 20))
+    if record <= MAX_RECORD: 
+        first_text = font.render(f'Game Over! Your record is {record}', True, white)
+        second_text = font.render('Press R to Restart', True, white)
+    else:
+        MAX_RECORD = record
+        first_text = font.render(f'Game Over! Your record is {record}', True, yellow)
+        second_text = font.render(f'You have broken the record!', True, yellow)
+        third_text = font.render('Press R to Restart', True, yellow)
+        text_surface.blit(third_text, (30, 20 + 2 * font.get_linesize()))
+
+    text_surface.blit(first_text, (30, 20))
+    text_surface.blit(second_text, (30, 20 + font.get_linesize()))
 
     # Выводим созданную менюшку на главный экран 
     display.blit(text_surface, (MAX_X // 4, MAX_Y // 4))
@@ -50,7 +64,10 @@ def update_record(record_surface, new_record):
 
     font = pygame.font.SysFont("Arial", 24)
     str_record = font.render(str(new_record), True, white)
+    str_max_record = font.render(str(MAX_RECORD), True, yellow)
+
     record_surface.blit(str_record, (10, 10))
+    record_surface.blit(str_max_record, (MAX_X - 20, 10))
 
     return record_surface
 
@@ -117,7 +134,7 @@ while(running):
         game_over = True
 
     if game_over:
-        display_game_over()
+        display_game_over(record)
         while(game_over and running):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
