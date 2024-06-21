@@ -9,7 +9,7 @@ MAX_Y = 600
 SNAKE_SIZE =  20
 FOOD_RADIUS = SNAKE_SIZE // 2
 RECORD_HEIGHT = MAX_Y // 15
-MAX_RECORD = 1
+MAX_RECORD = 27
 snake_color = blue = (0,0,255, 255)  # rgb(0,0,255, 255)
 background_color = white = (255, 255, 255, 255) #rgb(255, 255, 255, 255)
 snake_lose_color = red = (255, 0, 0, 255) # rgb(255, 0, 0, 255)
@@ -27,11 +27,6 @@ class Coordinate():
         if isinstance(coord, Coordinate):
             return self.x == coord.x and self.y == coord.y
         return False
-
-# class Snake():
-#     def __init__(self, coordinate : Coordinate):
-#         self.tail = [coordinate] 
-
 
 ### ФУНКЦИИ
 def create_food(display):
@@ -76,12 +71,12 @@ def display_game_over(record):
 def update_record(record_surface, new_record):
     record_surface.fill(blue)
 
-    font = pygame.font.SysFont("Arial", 24)
+    font = pygame.font.SysFont("Arial", RECORD_HEIGHT // 2)
     str_record = font.render(str(new_record), True, white)
     str_max_record = font.render(str(MAX_RECORD), True, yellow)
 
-    record_surface.blit(str_record, (10, 10))
-    record_surface.blit(str_max_record, (MAX_X - 20, 10))
+    record_surface.blit(str_record, (RECORD_HEIGHT // 4, RECORD_HEIGHT // 4 ))
+    record_surface.blit(str_max_record, (MAX_X // 2, RECORD_HEIGHT // 4))
 
     return record_surface
 
@@ -114,6 +109,12 @@ game_surface = pygame.Surface((MAX_X, MAX_Y - RECORD_HEIGHT))
 game_surface.fill(white)
 display.blit(game_surface, (0, RECORD_HEIGHT))
 
+# Рисуем бошку для змеи
+snake_head = pygame.Surface((SNAKE_SIZE, SNAKE_SIZE))
+snake_head.fill(blue)
+pygame.draw.rect(snake_head, red, [4, 4, 4, 8])
+pygame.draw.rect(snake_head, red, [12, 4, 4, 8])
+
 # Задаем начальные координаты змейки и нарисуем ее  
 set_default_parameters()
 
@@ -144,7 +145,7 @@ while(running):
 
     new_x = snake[0].x + x_change 
     new_y = snake[0].y + y_change 
-    # print(MAX_Y - RECORD_HEIGHT, new_x1, new_y1)
+
     if new_x < 0 or MAX_X <= new_x: 
         pygame.draw.rect(display, snake_lose_color, [snake[0].x, snake[0].y, SNAKE_SIZE, SNAKE_SIZE])
         game_over = True
@@ -172,7 +173,6 @@ while(running):
         head = Coordinate(new_x, new_y)   
         crash_flag = False    
         snake.insert(0, head) # двигаем голову змейки
-        pygame.draw.rect(display, snake_color, [head.x, head.y, SNAKE_SIZE, SNAKE_SIZE])
         for snake_part in snake[1:]: # рисуем всю змею
             if head == snake_part: 
                 crash_flag = True 
@@ -189,9 +189,12 @@ while(running):
             tail = snake.pop()
             pygame.draw.rect(display, white, [tail.x, tail.y, SNAKE_SIZE, SNAKE_SIZE]) # заливаем область, откуда ушла змейка
        
+        # рисуем красивую голову змеи 
+        display.blit(snake_head, (head.x, head.y))
         if crash_flag == True and head != tail: 
             pygame.draw.rect(display, snake_lose_color, [head.x, head.y, SNAKE_SIZE, SNAKE_SIZE])
             game_over = True
+
         pygame.display.update()
 
 pygame.quit()
