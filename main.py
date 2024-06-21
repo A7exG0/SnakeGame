@@ -9,14 +9,28 @@ MAX_Y = 600
 SNAKE_SIZE =  20
 FOOD_RADIUS = SNAKE_SIZE // 2
 RECORD_HEIGHT = MAX_Y // 15
-MAX_RECORD = 0
+MAX_RECORD = 1
 snake_color = blue = (0,0,255, 255)  # rgb(0,0,255, 255)
 background_color = white = (255, 255, 255, 255) #rgb(255, 255, 255, 255)
 snake_lose_color = red = (255, 0, 0, 255) # rgb(255, 0, 0, 255)
 food_color = (200, 10, 100, 255) # rgb(200, 10, 100, 255)
 yellow = (255, 255, 0, 255) # rgb(255, 255, 0, 255)  
-
 black = (0, 0, 0)
+
+### Классы
+class Coordinate():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __eq__(self, coord):
+        if isinstance(coord, Coordinate):
+            return self.x == coord.x and self.y == coord.y
+        return False
+
+# class Snake():
+#     def __init__(self, coordinate : Coordinate):
+#         self.tail = [coordinate] 
 
 
 ### ФУНКЦИИ
@@ -72,16 +86,18 @@ def update_record(record_surface, new_record):
     return record_surface
 
 def set_default_parameters():
-    global x1, y1, x1_change, y1_change, record, record_surface, display, x_food, y_food, running, game_over
+    global x1, y1, x_change, y_change, record, record_surface, display, x_food, y_food, running, game_over, snake
     x1 = y1 = 300
-    x1_change = y1_change = 0
-    record = 0
+    x_change = 20
+    y_change = 0
+    record = 1
     record_surface = update_record(record_surface, record)
     display.blit(record_surface, (0, 0))
     pygame.draw.rect(display, snake_color, [x1, y1, SNAKE_SIZE, SNAKE_SIZE])
     x_food, y_food = create_food(display)
     running = True 
     game_over = False 
+    snake = [Coordinate(x1, y1)]
 
 ### ОСНОВНОЙ КОД
 
@@ -109,32 +125,32 @@ while(running):
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_a and x1_change == 0:
-                x1_change = -SNAKE_SIZE
-                y1_change = 0
+            if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and x_change == 0:
+                x_change = -SNAKE_SIZE
+                y_change = 0
                 break 
-            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d and x1_change == 0:
-                x1_change = SNAKE_SIZE
-                y1_change = 0
+            elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and x_change == 0:
+                x_change = SNAKE_SIZE
+                y_change = 0
                 break
-            elif event.key == pygame.K_UP or event.key == pygame.K_w and y1_change == 0:
-                y1_change = -SNAKE_SIZE
-                x1_change = 0
+            elif (event.key == pygame.K_UP or event.key == pygame.K_w) and y_change == 0:
+                y_change = -SNAKE_SIZE
+                x_change = 0
                 break
-            elif event.key == pygame.K_DOWN or event.key == pygame.K_s and y1_change == 0:
-                y1_change = SNAKE_SIZE
-                x1_change = 0
+            elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and y_change == 0:
+                y_change = SNAKE_SIZE
+                x_change = 0
                 break
 
-    new_x1 = x1 + x1_change 
-    new_y1 = y1 + y1_change 
+    new_x = snake[0].x + x_change 
+    new_y = snake[0].y + y_change 
     # print(MAX_Y - RECORD_HEIGHT, new_x1, new_y1)
-    if new_x1 < 0 or MAX_X <= new_x1: 
-        pygame.draw.rect(display, snake_lose_color, [x1, y1, SNAKE_SIZE, SNAKE_SIZE])
+    if new_x < 0 or MAX_X <= new_x: 
+        pygame.draw.rect(display, snake_lose_color, [snake[0].x, snake[0].y, SNAKE_SIZE, SNAKE_SIZE])
         game_over = True
 
-    if new_y1 < RECORD_HEIGHT or MAX_Y <= new_y1: 
-        pygame.draw.rect(display, snake_lose_color, [x1, y1, SNAKE_SIZE, SNAKE_SIZE])
+    if new_y < RECORD_HEIGHT or MAX_Y <= new_y: 
+        pygame.draw.rect(display, snake_lose_color, [snake[0].x, snake[0].y, SNAKE_SIZE, SNAKE_SIZE])
         game_over = True
 
     if game_over:
@@ -151,16 +167,31 @@ while(running):
                         set_default_parameters()
                         pygame.display.update()
     else:
-        pygame.draw.rect(display, white, [x1, y1, SNAKE_SIZE, SNAKE_SIZE]) # заливаем область, откуда ушла змейка
-        x1 = new_x1 
-        y1 = new_y1 
         clock.tick(5)
-        pygame.draw.rect(display, snake_color, [x1, y1, SNAKE_SIZE, SNAKE_SIZE]) # x1, y1 - новая позиция змейки
-        if x1 == x_food and y1 == y_food: 
+
+        head = Coordinate(new_x, new_y)   
+        crash_flag = False    
+        snake.insert(0, head) # двигаем голову змейки
+        pygame.draw.rect(display, snake_color, [head.x, head.y, SNAKE_SIZE, SNAKE_SIZE])
+        for snake_part in snake[1:]: # рисуем всю змею
+            if head == snake_part: 
+                crash_flag = True 
+                break
+            pygame.draw.rect(display, snake_color, [snake_part.x, snake_part.y, SNAKE_SIZE, SNAKE_SIZE])
+
+        # если змейка скушала еду, то меняем рекорд и делаем новую еду, змейка уже увеличина
+        if head.x == x_food and head.y == y_food: 
             record += 1 
             record_surface = update_record(record_surface, record)
             display.blit(record_surface, (0, 0))
             x_food, y_food = create_food(display)
+        else: # если ничего не скушала, то нужно удалить хвост 
+            tail = snake.pop()
+            pygame.draw.rect(display, white, [tail.x, tail.y, SNAKE_SIZE, SNAKE_SIZE]) # заливаем область, откуда ушла змейка
+       
+        if crash_flag == True and head != tail: 
+            pygame.draw.rect(display, snake_lose_color, [head.x, head.y, SNAKE_SIZE, SNAKE_SIZE])
+            game_over = True
         pygame.display.update()
 
 pygame.quit()
