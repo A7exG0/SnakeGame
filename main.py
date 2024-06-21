@@ -45,6 +45,27 @@ def display_game_over():
     display.blit(text_surface, (MAX_X // 4, MAX_Y // 4))
     pygame.display.update()
 
+def update_record(record_surface, new_record):
+    record_surface.fill(blue)
+
+    font = pygame.font.SysFont("Arial", 24)
+    str_record = font.render(str(new_record), True, white)
+    record_surface.blit(str_record, (10, 10))
+
+    return record_surface
+
+def set_default_parameters():
+    global x1, y1, x1_change, y1_change, record, record_surface, display, x_food, y_food, running, game_over
+    x1 = y1 = 300
+    x1_change = y1_change = 0
+    record = 0
+    record_surface = update_record(record_surface, record)
+    display.blit(record_surface, (0, 0))
+    pygame.draw.rect(display, snake_color, [x1, y1, SNAKE_SIZE, SNAKE_SIZE])
+    x_food, y_food = create_food(display)
+    running = True 
+    game_over = False 
+
 ### ОСНОВНОЙ КОД
 
 # Здесь делаем окно игры 
@@ -54,7 +75,6 @@ pygame.display.set_caption('Snake Game')
 # Создадим верхню панель для фиксирования результата 
 record_surface = pygame.Surface((MAX_X, RECORD_HEIGHT))
 record_surface.fill(blue)
-display.blit(record_surface, (0, 0))
 
 # Создадим нижнюю игровую панель
 game_surface = pygame.Surface((MAX_X, MAX_Y - RECORD_HEIGHT))
@@ -62,20 +82,7 @@ game_surface.fill(white)
 display.blit(game_surface, (0, RECORD_HEIGHT))
 
 # Задаем начальные координаты змейки и нарисуем ее  
-x1 = 300
-y1 = 300
-x1_change = 0
-y1_change = 0
-record = 0
-pygame.draw.rect(display, snake_color, [x1, y1, SNAKE_SIZE, SNAKE_SIZE])
-
-# Нарисуем еду
-x_food, y_food = create_food(display)
-
-# Задаем необходимые флаги
-running = True 
-game_over = False 
-eat_food = False
+set_default_parameters()
 
 clock = pygame.time.Clock()
 
@@ -117,12 +124,10 @@ while(running):
                     running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
-                        # Устанавливаем начальные параметры
-                        game_over = False 
-                        x1 = 300 
-                        y1 = 300    
                         # Очищаем игровую область 
                         display.blit(game_surface, (0, RECORD_HEIGHT))
+                        # Устанавливаем начальные параметры
+                        set_default_parameters()
                         pygame.display.update()
     else:
         pygame.draw.rect(display, white, [x1, y1, SNAKE_SIZE, SNAKE_SIZE]) # заливаем область, откуда ушла змейка
@@ -132,7 +137,8 @@ while(running):
         pygame.draw.rect(display, snake_color, [x1, y1, SNAKE_SIZE, SNAKE_SIZE]) # x1, y1 - новая позиция змейки
         if x1 == x_food and y1 == y_food: 
             record += 1 
-            print(record)
+            record_surface = update_record(record_surface, record)
+            display.blit(record_surface, (0, 0))
             x_food, y_food = create_food(display)
         pygame.display.update()
 
