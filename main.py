@@ -85,16 +85,16 @@ while(running):
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_a and x1_change == 0:
                 x1_change = -SNAKE_SIZE
                 y1_change = 0
-            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d and x1_change == 0:
                 x1_change = SNAKE_SIZE
                 y1_change = 0
-            elif event.key == pygame.K_UP or event.key == pygame.K_w:
+            elif event.key == pygame.K_UP or event.key == pygame.K_w and y1_change == 0:
                 y1_change = -SNAKE_SIZE
                 x1_change = 0
-            elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+            elif event.key == pygame.K_DOWN or event.key == pygame.K_s and y1_change == 0:
                 y1_change = SNAKE_SIZE
                 x1_change = 0
 
